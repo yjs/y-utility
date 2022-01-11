@@ -40,7 +40,7 @@ The benchmarks show that `Y.Map` creates documents that depend on the number of 
 
 We measure the size of the `Y.Doc` using the different approaches (`Y.Map` vs `YKeyValue`).
 
-| operations | keys | `YKeyValue` doc size | `Y.Map` doc size | *JSON* size |
+| operations | keys | `YKeyValue` doc size (bytes) | `Y.Map` doc size (bytes) | *JSON* size (bytes) |
 |-- |-- | -- | -- | -- |
 | 100k | 10 | 271 | 524985 | 121 |
 | 100k | 100 | 2817 | 578231 | 1291 |
