@@ -1,0 +1,70 @@
+{
+  "name": "y-utility",
+  "version": "0.0.0",
+  "description": "",
+  "sideEffects": false,
+  "type": "module",
+  "funding": {
+    "type": "GitHub Sponsors ❤",
+    "url": "https://github.com/sponsors/dmonad"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./y-keyvalue": {
+      "import": "./y-keyvalue.js",
+      "require": "./dist/y-keyvalue.cjs"
+    }
+  },
+  "dependencies": {
+    "lib0": "^0.2.43",
+    "yjs": "^13.5.24"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
+    "concurrently": "^5.3.0",
+    "http-server": "^0.12.3",
+    "jsdoc-api": "^5.0.4",
+    "jsdoc-plugin-typescript": "^2.0.6",
+    "nyc": "^15.1.0",
+    "rollup": "^2.42.1",
+    "standard": "^14.3.4",
+    "typescript": "^4.2.3"
+  },
+  "scripts": {
+    "clean": "rm -rf dist *.d.ts */*.d.ts *.d.ts.map */*.d.ts.map",
+    "types": "tsc --outDir .",
+    "dist": "rollup -c",
+    "debug": "rollup -c && concurrently 'rollup -wc' 'http-server -o test.html'",
+    "test": "npm run clean && npm run lint && npm run dist && nyc --check-coverage --lines 100 --branches 100 --functions 100 --statements 100 node --unhandled-rejections=strict ./dist/test.cjs --repetition-time 50 --production",
+    "test-inspect": "node --inspect-brk --unhandled-rejections=strict ./test.js --repetition-time 50 --production",
+    "test-extensive": "node test.js && npm test -- --repetition-time 30000 --extensive",
+    "test-code-coverage": "npm run clean && npm run dist && nyc --reporter html node ./dist/test.cjs --production",
+    "trace-deopt": "clear && rollup -c  && node --trace-deopt dist/test.cjs",
+    "trace-opt": "clear && rollup -c  && node --trace-opt dist/test.cjs",
+    "lint": "standard && tsc",
+    "gendocs": "node ./bin/gendocs.js",
+    "preversion": "npm run clean && npm run test && npm run types && npm run dist && npm run gendocs && git add README.md",
+    "postpublish": "npm run clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmonad/lib0.git"
+  },
+  "author": "Kevin Jahns <kevin.jahns@protonmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dmonad/lib0/issues"
+  },
+  "homepage": "https://github.com/dmonad/lib0#readme",
+  "standard": {
+    "ignore": [
+      "/dist",
+      "/node_modules",
+      "/docs"
+    ]
+  },
+  "engines": {
+    "node": ">=12"
+  }
+}
