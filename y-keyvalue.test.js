@@ -41,7 +41,7 @@ export const testLogging = () => {
 }
 
 const numOfUpdates = 100000
-const numOfKeys = 10
+const numOfKeys = 1000
 const gen = prng.create(1337)
 
 export const testPerfYMap = () => {

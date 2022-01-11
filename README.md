@@ -3,15 +3,10 @@
 
 ## YKeyValue
 
-Y.Map doesn't make use of Yjs' optimizations if you write key-value entries alternating order. Always writing the same entry is very performant. But writing key1, then key2, then key1, then key2 (alternating order) is not, because it doesn't make use of Yjs' optimizations.
+Y.Map doesn't make use of Yjs' optimizations if you write key-value entries in alternating order. Always writing the same entry does't significantly increase the size of the document. But writing key1, then key2, then key1, then key2 (alternating order) breaks Yjs' optimization.
 YKeyValue implements a more efficient key-value store that allows frequently updating alternating entries.
 Y.Map needs to retain all key values that were created in history to resolve potential conflicts. This makes Y.Map unsuitable as a
-key-value store. Using this implementation, the size of your document will shrink significantly when
-deleting keys.
-
-Rough concept: We store `{ key, val }` pairs in an Y.Array. When you write a new entry,
-we append the `{ key, val }` pair to the yarray and remove all existing entries with the same key.
-Items that are more to the right have precedence.
+key-value store. Using this implementation, the size of your document will shrink significantly when deleting keys.
 
 ```js
 const ydoc = new Y.Doc()
@@ -44,7 +39,7 @@ We measure the size of the `Y.Doc` using the different approaches (`Y.Map` vs `Y
 |-- |-- | -- | -- | -- |
 | 100k | 10 | 271 | 524985 | 121 |
 | 100k | 100 | 2817 | 578231 | 1291 |
-| 100k | 1000 | 30017 | 593834 | 989489 |
+| 100k | 1000 | 30017 | 593834 | 13891 |
 | 500k | 10 | 329 | 2684482 | 131 |
 | 500k | 100 | 3013 | 2954249 | 1391 |
 | 500k | 1000 | 31005 | 2992244 | 14891 |
