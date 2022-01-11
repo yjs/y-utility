@@ -41,36 +41,34 @@ export const testLogging = () => {
 }
 
 const numOfUpdates = 100000
-const numOfKeys = 100
+const numOfKeys = 10
+const gen = prng.create(1337)
 
-/**
- * @param {t.TestCase} tc
- */
-export const testPerfYMap = tc => {
+export const testPerfYMap = () => {
   const ydoc = new Y.Doc()
+  ydoc.clientID = 0 // to get a consistent update size
   const ykv = ydoc.getMap()
   const time = t.measureTime(`writing ${numOfUpdates / 1000}k updates on ${numOfKeys} keys`, () => {
     for (let i = 0; i < numOfUpdates; i++) {
-      const key = prng.uint32(tc.prng, 0, numOfKeys - 1) + ''
+      const key = prng.uint32(gen, 0, numOfKeys - 1) + ''
       const val = i + ''
       ykv.set(key, val)
     }
   })
   t.assert(ykv.size === numOfKeys)
   t.info(`Size of the encoded document: ${Y.encodeStateAsUpdate(ydoc).length}`)
+  t.info(`Size of the json document: ${JSON.stringify(ykv.toJSON()).length}`)
   t.info(`Time per op: ${Math.round(time / numOfUpdates)}`)
 }
 
-/**
- * @param {t.TestCase} tc
- */
-export const testPerfKv = tc => {
+export const testPerfKv = () => {
   const ydoc = new Y.Doc()
+  ydoc.clientID = 0 // to get a consistent update size
   const yarr = ydoc.getArray()
   const ykv = new YKeyValue(yarr)
   const time = t.measureTime(`writing ${numOfUpdates / 1000}k updates on ${numOfKeys} keys`, () => {
     for (let i = 0; i < numOfUpdates; i++) {
-      const key = prng.uint32(tc.prng, 0, numOfKeys - 1) + ''
+      const key = prng.uint32(gen, 0, numOfKeys - 1) + ''
       const val = i + ''
       ykv.set(key, val)
     }

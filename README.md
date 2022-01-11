@@ -38,14 +38,16 @@ the keys.
 
 The benchmarks show that `Y.Map` creates documents that depend on the number of operations created. While `YKeyValue`'s size only depends on the size of the map.
 
-| operations | keys | *YKeyValue* size | *Y.Map* size |
-|-- |-- | -- | -- |
-| 100k | 10 | 310 | 884176 |
-| 100k | 100 | 3299 | 973857 |
-| 100k | 1000 | 32653 | 989489 |
-| 500k | 10 | 379 | 4484224 |
-| 500k | 100 | 3373 | 4935138 |
-| 500k | 1000 | 33463 | 4986641 |
+We measure the size of the `Y.Doc` using the different approaches (`Y.Map` vs `YKeyValue`).
+
+| operations | keys | `YKeyValue` doc size | `Y.Map` doc size | *JSON* size |
+|-- |-- | -- | -- | -- |
+| 100k | 10 | 271 | 524985 | 121 |
+| 100k | 100 | 2817 | 578231 | 1291 |
+| 100k | 1000 | 30017 | 593834 | 989489 |
+| 500k | 10 | 329 | 2684482 | 131 |
+| 500k | 100 | 3013 | 2954249 | 1391 |
+| 500k | 1000 | 31005 | 2992244 | 14891 |
 
 ### Potential optimization
 
