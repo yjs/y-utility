@@ -1,7 +1,7 @@
 {
   "name": "y-utility",
   "version": "0.1.0",
-  "description": "",
+  "description": "Utility features for Yjs",
   "sideEffects": false,
   "type": "module",
   "funding": {
@@ -55,14 +55,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dmonad/lib0.git"
+    "url": "git+https://github.com/yjs/y-utility.git"
   },
   "author": "Kevin Jahns <kevin.jahns@protonmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dmonad/lib0/issues"
+    "url": "https://github.com/yjs/y-utility/issues"
   },
-  "homepage": "https://github.com/dmonad/lib0#readme",
+  "homepage": "https://github.com/yjs/y-utility#readme",
   "standard": {
     "ignore": [
       "/dist",
