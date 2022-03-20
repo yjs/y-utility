@@ -1,6 +1,8 @@
 import { runTests } from 'lib0/testing'
-import * as kv from './y-keyvalue.test.js'
 import * as log from 'lib0/logging'
+
+import * as kv from './y-keyvalue.test.js'
+import * as undoredo from './y-multidoc-undomanager.test.js'
 
 import { isBrowser, isNode } from 'lib0/environment'
 
@@ -10,7 +12,8 @@ if (isBrowser) {
 }
 
 runTests({
-  kv
+  kv,
+  undoredo
 }).then(success => {
   /* istanbul ignore next */
   if (isNode) {
