@@ -44,6 +44,27 @@ export const testUndo = tc => {
 /**
  * @param {t.TestCase} tc
  */
+export const testUndoMap = tc => {
+  const ydoc1 = new Y.Doc()
+  const ymap = ydoc1.getMap()
+  const um = new MultiDocUndoManager([ymap], {
+    trackedOrigins: new Set(['this-client'])
+  })
+
+  ydoc1.transact(tr => {
+    ymap.set('a', 1)
+  }, 'this-client')
+
+  t.assert(ymap.get('a') === 1)
+  um.undo()
+  t.assert(ymap.get('a') === undefined)
+  um.redo()
+  t.assert(ymap.get('a') === 1)
+}
+
+/**
+ * @param {t.TestCase} tc
+ */
 export const testUndoEvents = tc => {
   const undoManager = new MultiDocUndoManager()
   const ydoc1 = new Y.Doc()
