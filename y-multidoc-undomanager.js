@@ -50,6 +50,8 @@ export class MultiDocUndoManager extends Observable {
      * @type {Map<Y.Doc, Y.UndoManager>}
      */
     this.docs = new Map()
+    this.trackedOrigins = opts.trackedOrigins || new Set([null])
+    opts.trackedOrigins = this.trackedOrigins
     this._defaultOpts = opts
     /**
      * @type {Array<Y.UndoManager>}
@@ -98,6 +100,20 @@ export class MultiDocUndoManager extends Observable {
         um.scope.push(ytype)
       }
     })
+  }
+
+  /**
+   * @param {any} origin
+   */
+  addTrackedOrigin (origin) {
+    this.trackedOrigins.add(origin)
+  }
+
+  /**
+   * @param {any} origin
+   */
+  removeTrackedOrigin (origin) {
+    this.trackedOrigins.delete(origin)
   }
 
   /**
