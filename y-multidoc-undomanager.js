@@ -4,12 +4,6 @@ import { Observable } from 'lib0/observable'
 import * as Y from 'yjs'
 
 /**
- * @typedef {Object} UndoManagerOptions
- * @property {number} [UndoManagerOptions.captureTimeout=500]
- * @property {Set<any>} [UndoManagerOptions.trackedOrigins=new Set([null])]
- */
-
-/**
  * @param {MultiDocUndoManager} mum
  * @param {'undo' | 'redo'} type
  */
@@ -42,7 +36,7 @@ const popStackItem = (mum, type) => {
 export class MultiDocUndoManager extends Observable {
   /**
    * @param {Y.AbstractType<any>|Array<Y.AbstractType<any>>} typeScope Accepts either a single type, or an array of types
-   * @param {UndoManagerOptions} opts
+   * @param {ConstructorParameters<typeof Y.UndoManager>[1]} opts
    */
   constructor (typeScope = [], opts = {}) {
     super()
