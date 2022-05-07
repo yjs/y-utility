@@ -1,14 +1,14 @@
 
 # Utilities for Yjs
 
-## MultiDocUndoManager
+## YMultiDocUndoManager
 
 The `Y.UndoManager` only tracks operations on a single `Y.Doc`. Previously, you needed to maintain several undo managers if you had several documents. With the introduction of subdocuments, we now have documents nested inside each other and it often makes sense to have only a single undo/redo history for the document collection.
 
-`MultiDocUndoManager` is an UndoManager that enables you to track operations on a collection of documents. It implements the same API as `Y.UndoManager` and can safely be used in editor bindings that accept an existing `Y.UndoManager` as a parameter.
+`YMultiDocUndoManager` is an UndoManager that enables you to track operations on a collection of documents. It implements the same API as `Y.UndoManager` and can safely be used in editor bindings that accept an existing `Y.UndoManager` as a parameter.
 
 ```js
-import { MultiDocUndoManager } from 'y-utility/y-multidoc-undomanager'
+import { YMultiDocUndoManager } from 'y-utility/y-multidoc-undomanager'
 
 const ydoc1 = new Y.Doc()
 const ymap1 = ydoc1.getMap('my-map')
@@ -16,7 +16,7 @@ const ydoc2 = new Y.Doc()
 const yarray2 = ydoc1.getArray('my-array')
 
 // either specify tracked types at the beginning
-const um = new MultiDocUndoManager([ymap])
+const um = new YMultiDocUndoManager([ymap])
 // or add them dynamically
 um.addToScope([yarray2])
 

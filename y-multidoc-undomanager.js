@@ -10,7 +10,7 @@ import * as Y from 'yjs'
  */
 
 /**
- * @param {MultiDocUndoManager} mum
+ * @param {YMultiDocUndoManager} mum
  * @param {'undo' | 'redo'} type
  */
 const popStackItem = (mum, type) => {
@@ -39,7 +39,7 @@ const popStackItem = (mum, type) => {
 /**
  * @extends Observable<any>
  */
-export class MultiDocUndoManager extends Observable {
+export class YMultiDocUndoManager extends Observable {
   /**
    * @param {Y.AbstractType<any>|Array<Y.AbstractType<any>>} typeScope Accepts either a single type, or an array of types
    * @param {UndoManagerOptions} opts
@@ -174,3 +174,9 @@ export class MultiDocUndoManager extends Observable {
     super.destroy()
   }
 }
+
+/**
+ * @todo remove
+ * @deprecated Use YMultiDocUndoManager instead
+ */
+export const MultiDocUndoManager = YMultiDocUndoManager
