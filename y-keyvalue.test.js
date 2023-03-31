@@ -4,7 +4,7 @@ import { YKeyValue } from './y-keyvalue.js'
 import * as t from 'lib0/testing'
 import * as prng from 'lib0/prng'
 
-export const testLogging = () => {
+export const testBasic = () => {
   const ydoc = new Y.Doc()
   ydoc.clientID = 0 // forces the other client to have a higher clientid
   const yarr = ydoc.getArray()
@@ -37,10 +37,30 @@ export const testLogging = () => {
   t.compare(lastEvent, { action: 'update', oldValue: 'new', newValue: 'overwritten' })
 
   t.assert(ykv.get('key1') === 'overwritten')
+  t.assert(ykv.has('key1'))
+  t.assert(!ykv.has('key2'))
+  t.assert(ykv.yarray.length === 1)
+
+  // check that we can safely re-initiate a YKV
+  const ykv1Duplicate = new YKeyValue(yarr)
+  t.assert(ykv1Duplicate.get('key1') === 'overwritten')
+  // remote changes that are overwritten should be removed and shouldn't have any effect
+  ykv1Duplicate.yarray.insert(0, [{ key: 'key1', val: 'nope' }])
+  t.assert(ykv1Duplicate.get('key1') === 'overwritten')
   t.assert(ykv.yarray.length === 1)
 }
 
-const numOfUpdates = 100000
+export const testInit = () => {
+  const ydoc = new Y.Doc()
+  ydoc.clientID = 0 // forces the other client to have a higher clientid
+  const yarr = ydoc.getArray()
+  yarr.insert(0, [{ key: 'key1', val: 'old' }, { key: 'key1', val: 'overwritten' }])
+  const ykv = new YKeyValue(yarr)
+  t.assert(ykv.get('key1') === 'overwritten')
+  t.assert(ykv.yarray.length === 1)
+}
+
+const numOfUpdates = 10000
 const numOfKeys = 1000
 const gen = prng.create(1337)
 

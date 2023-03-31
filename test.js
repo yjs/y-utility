@@ -6,7 +6,7 @@ import * as undoredo from './y-multidoc-undomanager.test.js'
 
 import { isBrowser, isNode } from 'lib0/environment'
 
-/* istanbul ignore if */
+/* c8 ignore next 3 */
 if (isBrowser) {
   log.createVConsole(document.body)
 }
@@ -15,7 +15,7 @@ runTests({
   kv,
   undoredo
 }).then(success => {
-  /* istanbul ignore next */
+  /* c8 ignore next 3 */
   if (isNode) {
     process.exit(success ? 0 : 1)
   }

@@ -39,7 +39,7 @@ export class YKeyValue extends Observable {
     {
       // initialize the map and cleanup duplicate items
       const arr = yarray.toArray()
-      this.doc.transact(tr => {
+      this.doc.transact(() => {
         for (let i = arr.length - 1; i >= 0; i--) {
           const v = arr[i]
           if (this.map.has(v.key)) {
