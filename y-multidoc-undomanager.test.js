@@ -1,12 +1,12 @@
 import * as Y from 'yjs'
 import * as t from 'lib0/testing'
-import { MultiDocUndoManager } from './y-multidoc-undomanager.js'
+import { YMultiDocUndoManager } from './y-multidoc-undomanager.js'
 
 /**
  * @param {t.TestCase} tc
  */
 export const testUndo = tc => {
-  const um = new MultiDocUndoManager()
+  const um = new YMultiDocUndoManager()
   const ydoc1 = new Y.Doc()
   const ydoc2 = new Y.Doc()
   const ytype1 = ydoc1.getText()
@@ -47,7 +47,7 @@ export const testUndo = tc => {
 export const testUndoMap = tc => {
   const ydoc1 = new Y.Doc()
   const ymap = ydoc1.getMap()
-  const um = new MultiDocUndoManager([ymap], {
+  const um = new YMultiDocUndoManager([ymap], {
     trackedOrigins: new Set(['this-client'])
   })
 
@@ -66,7 +66,7 @@ export const testUndoMap = tc => {
  * @param {t.TestCase} tc
  */
 export const testUndoEvents = tc => {
-  const undoManager = new MultiDocUndoManager()
+  const undoManager = new YMultiDocUndoManager()
   const ydoc1 = new Y.Doc()
   const text0 = ydoc1.getText()
   undoManager.addToScope([text0])
@@ -87,4 +87,35 @@ export const testUndoEvents = tc => {
   t.assert(receivedMetadata === 0)
   undoManager.redo()
   t.assert(receivedMetadata === 1)
+}
+
+/**
+ * @param {t.TestCase} tc
+ */
+export const testUndoAfterChangeAfterUndo = tc => {
+  const um = new YMultiDocUndoManager([], { captureTimeout: -1 })
+  const ydoc1 = new Y.Doc()
+  const ytype1 = ydoc1.getText()
+  um.addToScope([ytype1])
+  ytype1.insert(0, 'a')
+  t.assert(ytype1.toString() === 'a')
+  t.assert(um.undoStack.length === 1)
+  ytype1.insert(1, 'b')
+  t.assert(ytype1.toString() === 'ab')
+  t.assert(um.undoStack.length === 2)
+  ytype1.insert(2, 'c')
+  t.assert(ytype1.toString() === 'abc')
+  t.assert(um.undoStack.length === 3)
+  um.undo()
+  t.assert(ytype1.toString() === 'ab')
+  t.assert(um.undoStack.length === 2)
+  ytype1.insert(2, 'x')
+  t.assert(ytype1.toString() === 'abx')
+  t.assert(um.undoStack.length === 3)
+  um.undo()
+  t.assert(ytype1.toString() === 'ab')
+  t.assert(um.undoStack.length === 2)
+  um.undo()
+  t.assert(ytype1.toString() === 'a')
+  t.assert(um.undoStack.length === 1)
 }

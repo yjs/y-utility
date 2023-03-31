@@ -4,7 +4,7 @@ import { Observable } from 'lib0/observable'
 import * as Y from 'yjs'
 
 /**
- * @param {MultiDocUndoManager} mum
+ * @param {YMultiDocUndoManager} mum
  * @param {'undo' | 'redo'} type
  */
 const popStackItem = (mum, type) => {
@@ -33,7 +33,7 @@ const popStackItem = (mum, type) => {
 /**
  * @extends Observable<any>
  */
-export class MultiDocUndoManager extends Observable {
+export class YMultiDocUndoManager extends Observable {
   /**
    * @param {Y.AbstractType<any>|Array<Y.AbstractType<any>>} typeScope Accepts either a single type, or an array of types
    * @param {ConstructorParameters<typeof Y.UndoManager>[1]} opts
@@ -131,8 +131,8 @@ export class MultiDocUndoManager extends Observable {
   clear (clearUndoStack = true, clearRedoStack = true) {
     if ((clearUndoStack && this.canUndo()) || (clearRedoStack && this.canRedo())) {
       this.docs.forEach(um => {
-        this.undoStack = []
-        this.redoStack = []
+        clearUndoStack && (this.undoStack = [])
+        clearRedoStack && (this.redoStack = [])
         um.clear(clearUndoStack, clearRedoStack)
       })
       this.emit('stack-cleared', [{ undoStackCleared: clearUndoStack, redoStackCleared: clearRedoStack }])
@@ -168,3 +168,9 @@ export class MultiDocUndoManager extends Observable {
     super.destroy()
   }
 }
+
+/**
+ * @todo remove
+ * @deprecated Use YMultiDocUndoManager instead
+ */
+export const MultiDocUndoManager = YMultiDocUndoManager

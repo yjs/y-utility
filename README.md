@@ -1,6 +1,32 @@
 
 # Utilities for Yjs
 
+## YMultiDocUndoManager
+
+The `Y.UndoManager` only tracks operations on a single `Y.Doc`. Previously, you needed to maintain several undo managers if you had several documents. With the introduction of subdocuments, we now have documents nested inside each other and it often makes sense to have only a single undo/redo history for the document collection.
+
+`YMultiDocUndoManager` is an UndoManager that enables you to track operations on a collection of documents. It implements the same API as `Y.UndoManager` and can safely be used in editor bindings that accept an existing `Y.UndoManager` as a parameter.
+
+```js
+import { YMultiDocUndoManager } from 'y-utility/y-multidoc-undomanager'
+
+const ydoc1 = new Y.Doc()
+const ymap1 = ydoc1.getMap('my-map')
+const ydoc2 = new Y.Doc()
+const yarray2 = ydoc1.getArray('my-array')
+
+// either specify tracked types at the beginning
+const um = new YMultiDocUndoManager([ymap])
+// or add them dynamically
+um.addToScope([yarray2])
+
+ymap1.set('a', 1)
+yarray2.insert(0, ['a'])
+
+um.undo() // yarray.toArray() ⇒ []
+um.undo() // ymap.toJSON() ⇒ {}
+```
+
 ## YKeyValue
 
 Y.Map doesn't make use of Yjs' optimizations if you write key-value entries in alternating order. Always writing the same entry does't significantly increase the size of the document. But writing key1, then key2, then key1, then key2 (alternating order) breaks Yjs' optimization.
@@ -9,6 +35,9 @@ Y.Map needs to retain all key values that were created in history to resolve pot
 key-value store. Using this implementation, the size of your document will shrink significantly when deleting keys.
 
 ```js
+import * as Y from 'yjs'
+import { YKeyValue } from 'y-utility/y-keyvalue'
+
 const ydoc = new Y.Doc()
 const yarr = ydoc.getArray()
 const ykv = new YKeyValue(yarr)
