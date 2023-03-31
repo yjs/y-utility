@@ -1,4 +1,3 @@
-
 import * as Y from 'yjs' // eslint-disable-line
 import { Observable } from 'lib0/observable'
 
@@ -53,7 +52,7 @@ export class YKeyValue extends Observable {
       })
     }
     // track when new items are added/removed and update this.map
-    yarray.observe(event => {
+    yarray.observe((event, tx) => {
       /**
        * This is the change-event we calculate. It works similarly to Y.MapEvent.keys (I added support for newValue)
        *
@@ -134,7 +133,7 @@ export class YKeyValue extends Observable {
         }
       })
       if (changes.size > 0) {
-        this.emit('change', [changes])
+        this.emit('change', [changes, tx])
       }
     })
   }
