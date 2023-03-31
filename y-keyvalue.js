@@ -95,7 +95,7 @@ export class YKeyValue extends Observable {
        */
       const itemsToRemove = new Set()
       const vals = yarray.toArray()
-      this.doc.transact(tr => {
+      this.doc.transact(_tr => {
         /**
          * Iterate from right to left and update the map while we find the items in addedVals
          */
@@ -143,7 +143,7 @@ export class YKeyValue extends Observable {
    * @param {T} val
    */
   set (key, val) {
-    this.doc.transact(tr => {
+    this.doc.transact(_tr => {
       // if this value existed before, we will delete it first
       if (this.map.has(key)) {
         this.delete(key)

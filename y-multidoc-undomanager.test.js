@@ -3,9 +3,9 @@ import * as t from 'lib0/testing'
 import { YMultiDocUndoManager } from './y-multidoc-undomanager.js'
 
 /**
- * @param {t.TestCase} tc
+ * @param {t.TestCase} _tc
  */
-export const testUndo = tc => {
+export const testUndo = _tc => {
   const um = new YMultiDocUndoManager()
   const ydoc1 = new Y.Doc()
   const ydoc2 = new Y.Doc()
@@ -47,16 +47,16 @@ export const testUndo = tc => {
 }
 
 /**
- * @param {t.TestCase} tc
+ * @param {t.TestCase} _tc
  */
-export const testUndoMap = tc => {
+export const testUndoMap = _tc => {
   const ydoc1 = new Y.Doc()
   const ymap = ydoc1.getMap()
   const um = new YMultiDocUndoManager([ymap], {
     trackedOrigins: new Set(['this-client'])
   })
 
-  ydoc1.transact(tr => {
+  ydoc1.transact(_tr => {
     ymap.set('a', 1)
   }, 'this-client')
 
@@ -68,9 +68,9 @@ export const testUndoMap = tc => {
 }
 
 /**
- * @param {t.TestCase} tc
+ * @param {t.TestCase} _tc
  */
-export const testUndoEvents = tc => {
+export const testUndoEvents = _tc => {
   const undoManager = new YMultiDocUndoManager()
   const ydoc1 = new Y.Doc()
   const text0 = ydoc1.getText()
@@ -83,7 +83,7 @@ export const testUndoEvents = tc => {
     t.assert(event.changedParentTypes != null && event.changedParentTypes.has(text0))
     event.stackItem.meta.set('test', counter++)
   })
-  undoManager.on('stack-item-updated', /** @param {any} event */ event => {
+  undoManager.on('stack-item-updated', /** @param {any} _event */ _event => {
     itemUpdated = true
   })
   undoManager.on('stack-item-popped', /** @param {any} event */ event => {
@@ -103,9 +103,9 @@ export const testUndoEvents = tc => {
 }
 
 /**
- * @param {t.TestCase} tc
+ * @param {t.TestCase} _tc
  */
-export const testUndoAfterChangeAfterUndo = tc => {
+export const testUndoAfterChangeAfterUndo = _tc => {
   const um = new YMultiDocUndoManager([], { captureTimeout: -1 })
   const ydoc1 = new Y.Doc()
   const ytype1 = ydoc1.getText()
@@ -134,9 +134,9 @@ export const testUndoAfterChangeAfterUndo = tc => {
 }
 
 /**
- * @param {t.TestCase} tc
+ * @param {t.TestCase} _tc
  */
-export const testAfterDestroy = tc => {
+export const testAfterDestroy = _tc => {
   const um = new YMultiDocUndoManager([], { captureTimeout: -1 })
   const ydoc1 = new Y.Doc()
   const ytype1 = ydoc1.getText()
