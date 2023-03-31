@@ -88,3 +88,34 @@ export const testUndoEvents = tc => {
   undoManager.redo()
   t.assert(receivedMetadata === 1)
 }
+
+/**
+ * @param {t.TestCase} tc
+ */
+export const testUndoAfterChangeAfterUndo = tc => {
+  const um = new YMultiDocUndoManager([], { captureTimeout: -1 })
+  const ydoc1 = new Y.Doc()
+  const ytype1 = ydoc1.getText()
+  um.addToScope([ytype1])
+  ytype1.insert(0, 'a')
+  t.assert(ytype1.toString() === 'a')
+  t.assert(um.undoStack.length === 1)
+  ytype1.insert(1, 'b')
+  t.assert(ytype1.toString() === 'ab')
+  t.assert(um.undoStack.length === 2)
+  ytype1.insert(2, 'c')
+  t.assert(ytype1.toString() === 'abc')
+  t.assert(um.undoStack.length === 3)
+  um.undo()
+  t.assert(ytype1.toString() === 'ab')
+  t.assert(um.undoStack.length === 2)
+  ytype1.insert(2, 'x')
+  t.assert(ytype1.toString() === 'abx')
+  t.assert(um.undoStack.length === 3)
+  um.undo()
+  t.assert(ytype1.toString() === 'ab')
+  t.assert(um.undoStack.length === 2)
+  um.undo()
+  t.assert(ytype1.toString() === 'a')
+  t.assert(um.undoStack.length === 1)
+}

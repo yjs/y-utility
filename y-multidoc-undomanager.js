@@ -137,8 +137,8 @@ export class YMultiDocUndoManager extends Observable {
   clear (clearUndoStack = true, clearRedoStack = true) {
     if ((clearUndoStack && this.canUndo()) || (clearRedoStack && this.canRedo())) {
       this.docs.forEach(um => {
-        this.undoStack = []
-        this.redoStack = []
+        clearUndoStack && (this.undoStack = [])
+        clearRedoStack && (this.redoStack = [])
         um.clear(clearUndoStack, clearRedoStack)
       })
       this.emit('stack-cleared', [{ undoStackCleared: clearUndoStack, redoStackCleared: clearRedoStack }])
