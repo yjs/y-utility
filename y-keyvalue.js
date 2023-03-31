@@ -52,7 +52,7 @@ export class YKeyValue extends Observable {
       })
     }
     // track when new items are added/removed and update this.map
-    yarray.observe((event, tx) => {
+    yarray.observe((event, tr) => {
       /**
        * This is the change-event we calculate. It works similarly to Y.MapEvent.keys (I added support for newValue)
        *
@@ -133,7 +133,7 @@ export class YKeyValue extends Observable {
         }
       })
       if (changes.size > 0) {
-        this.emit('change', [changes, tx])
+        this.emit('change', [changes, tr])
       }
     })
   }
