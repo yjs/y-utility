@@ -27,7 +27,12 @@ export const testUndo = tc => {
   t.assert(um.canRedo())
   t.assert(ytype1.toString() === '')
   t.assert(ytype2.toString() === '')
-
+  // shouldn't have any effect
+  um.undo()
+  t.assert(!um.canUndo())
+  t.assert(um.canRedo())
+  t.assert(ytype1.toString() === '')
+  t.assert(ytype2.toString() === '')
   um.redo()
   t.assert(um.canUndo())
   t.assert(um.canRedo())
@@ -72,17 +77,25 @@ export const testUndoEvents = tc => {
   undoManager.addToScope([text0])
   let counter = 0
   let receivedMetadata = -1
+  let itemUpdated = false
   undoManager.on('stack-item-added', /** @param {any} event */ event => {
     t.assert(event.type != null)
     t.assert(event.changedParentTypes != null && event.changedParentTypes.has(text0))
     event.stackItem.meta.set('test', counter++)
+  })
+  undoManager.on('stack-item-updated', /** @param {any} event */ event => {
+    itemUpdated = true
   })
   undoManager.on('stack-item-popped', /** @param {any} event */ event => {
     t.assert(event.type != null)
     t.assert(event.changedParentTypes != null && event.changedParentTypes.has(text0))
     receivedMetadata = event.stackItem.meta.get('test')
   })
+  t.assert(!itemUpdated)
   text0.insert(0, 'abc')
+  t.assert(!itemUpdated)
+  text0.insert(0, 'abc')
+  t.assert(itemUpdated)
   undoManager.undo()
   t.assert(receivedMetadata === 0)
   undoManager.redo()
@@ -118,4 +131,26 @@ export const testUndoAfterChangeAfterUndo = tc => {
   um.undo()
   t.assert(ytype1.toString() === 'a')
   t.assert(um.undoStack.length === 1)
+}
+
+/**
+ * @param {t.TestCase} tc
+ */
+export const testAfterDestroy = tc => {
+  const um = new YMultiDocUndoManager([], { captureTimeout: -1 })
+  const ydoc1 = new Y.Doc()
+  const ytype1 = ydoc1.getText()
+  const ydoc2 = new Y.Doc()
+  const ytype2 = ydoc2.getText()
+  um.addToScope([ytype1])
+  um.addToScope([ytype2])
+  um.addToScope(ytype1) // doing this twice for test-coverage
+  ytype1.insert(0, 'a')
+  ytype2.insert(0, 'b')
+  t.assert(ytype1.toString() === 'a')
+  ydoc2.destroy()
+  t.assert(!um.docs.has(ydoc2))
+  um.undo()
+  t.assert(ytype1.toString() === '')
+  um.destroy()
 }

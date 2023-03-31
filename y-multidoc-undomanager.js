@@ -72,8 +72,8 @@ export class YMultiDocUndoManager extends Observable {
         })
         ydoc.on('destroy', () => {
           this.docs.delete(ydoc)
-          this.undoStack = this.undoStack.filter(um => um.doc === ydoc)
-          this.redoStack = this.redoStack.filter(um => um.doc === ydoc)
+          this.undoStack = this.undoStack.filter(um => um.doc !== ydoc)
+          this.redoStack = this.redoStack.filter(um => um.doc !== ydoc)
         })
         um.on('stack-item-added', /** @param {any} change */ change => {
           const stack = change.type === 'undo' ? this.undoStack : this.redoStack
@@ -90,6 +90,7 @@ export class YMultiDocUndoManager extends Observable {
         // emit events from um to multium
         return um
       })
+      /* c8 ignore next 4 */
       if (um.scope.every(yt => yt !== ytype)) {
         um.scope.push(ytype)
       }
@@ -99,6 +100,7 @@ export class YMultiDocUndoManager extends Observable {
   /**
    * @param {any} origin
    */
+  /* c8 ignore next 3 */
   addTrackedOrigin (origin) {
     this.trackedOrigins.add(origin)
   }
@@ -106,6 +108,7 @@ export class YMultiDocUndoManager extends Observable {
   /**
    * @param {any} origin
    */
+  /* c8 ignore next 3 */
   removeTrackedOrigin (origin) {
     this.trackedOrigins.delete(origin)
   }
@@ -129,9 +132,12 @@ export class YMultiDocUndoManager extends Observable {
   }
 
   clear (clearUndoStack = true, clearRedoStack = true) {
+    /* c8 ignore next */
     if ((clearUndoStack && this.canUndo()) || (clearRedoStack && this.canRedo())) {
       this.docs.forEach(um => {
+        /* c8 ignore next */
         clearUndoStack && (this.undoStack = [])
+        /* c8 ignore next */
         clearRedoStack && (this.redoStack = [])
         um.clear(clearUndoStack, clearRedoStack)
       })
@@ -139,6 +145,7 @@ export class YMultiDocUndoManager extends Observable {
     }
   }
 
+  /* c8 ignore next 5 */
   stopCapturing () {
     this.docs.forEach(um => {
       um.stopCapturing()
