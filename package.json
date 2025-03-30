@@ -22,7 +22,7 @@
     }
   },
   "peerDependencies": {
-    "yjs": "^13.5.29"
+    "yjs": "^13.6.23"
   },
   "dependencies": {
     "lib0": "^0.2.43"

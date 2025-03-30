@@ -17,7 +17,7 @@ import { Observable } from 'lib0/observable'
  * This type fires events similarly to Y.Map
  *
  * ```js
- * yefficientmap.on('change', changes => {
+ * ykeyvalue.on('change', changes => {
  *   changes // => Map<string, { action: 'delete', oldValue: T } | { action: 'update', oldValue: T, newValue: T } | { action: 'add', newValue: T }>
  * })
  * ```
