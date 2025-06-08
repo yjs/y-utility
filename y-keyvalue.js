@@ -25,17 +25,62 @@ import { Observable } from 'lib0/observable'
 export class YKeyValue extends Observable {
   /**
    * @param {Y.Array<{ key: string, val: T }>} yarray
+   * @param {Object} [options] - Configuration options
+   * @param {number} [options.cleanupThreshold=1000] - Array size threshold for cleanup
+   * @param {number} [options.autoCleanupInterval=500] - Interval for automatic cleanup checks
+   * @param {number} [options.fragmentationRatio=1.5] - Ratio of array size to unique keys that triggers cleanup
+   * @param {number} [options.minCleanupSize=100] - Minimum array size before cleanup is considered
    */
-  constructor (yarray) {
+  constructor (yarray, options = {}) {
     super()
     this.yarray = yarray
     this.doc = /** @type {Y.Doc} */ (yarray.doc)
+    
+    // Configuration options with default values
+    const {
+      cleanupThreshold = 1000,
+      autoCleanupInterval = 500,
+      fragmentationRatio = 1.5,
+      minCleanupSize = 100
+    } = options
+    
     /**
      * Store the key-val pair so we can do identity-based comparisons.
      *
      * @type {Map<string, { key: string, val: T }>}
      */
     this.map = new Map()
+    
+    /**
+     * Performance optimization: Track array size for cleanup decisions
+     * @type {number}
+     */
+    this._lastCleanupSize = 0
+    
+    /**
+     * Configuration: Cleanup threshold
+     * @type {number}
+     */
+    this._cleanupThreshold = cleanupThreshold
+    
+    /**
+     * Configuration: Auto cleanup interval
+     * @type {number}
+     */
+    this._autoCleanupInterval = autoCleanupInterval
+    
+    /**
+     * Configuration: Fragmentation ratio for cleanup
+     * @type {number}
+     */
+    this._fragmentationRatio = fragmentationRatio
+    
+    /**
+     * Configuration: Minimum size for cleanup consideration
+     * @type {number}
+     */
+    this._minCleanupSize = minCleanupSize
+
     {
       // initialize the map and cleanup duplicate items
       const arr = yarray.toArray()
@@ -150,20 +195,43 @@ export class YKeyValue extends Observable {
       }
       this.yarray.push([{ key, val }])
     })
+    // Only cleanup occasionally to avoid overhead
+    if (this.yarray.length % this._autoCleanupInterval === 0) {
+      this._maybeCleanup()
+    }
+  }
+
+  /**
+   * Batch set multiple key-value pairs in a single transaction for better performance
+   * @param {Array<{key: string, val: T}>} entries
+   */
+  setBatch (entries) {
+    if (entries.length === 0) return
+    
+    // Optimize: deduplicate entries in batch (keep last occurrence of each key)
+    const deduped = new Map()
+    entries.forEach(({ key, val }) => {
+      deduped.set(key, { key, val })
+    })
+    const optimizedEntries = Array.from(deduped.values())
+    
+    this.doc.transact(_tr => {
+      // For batch operations, just append - let the observe handler deal with duplicates
+      this.yarray.push(optimizedEntries)
+    })
   }
 
   /**
    * @param {string} key
    */
   delete (key) {
-    let i = 0
-    // eslint-disable-next-line no-unused-vars
-    for (const val of this.yarray) {
+    // Traverse and delete from the end to the front, because items on the right have priority.
+    for (let i = this.yarray.length - 1; i >= 0; i--) {
+      const val = this.yarray.get(i)
       if (val.key === key) {
         this.yarray.delete(i)
         break
       }
-      i++
     }
   }
 
@@ -181,5 +249,77 @@ export class YKeyValue extends Observable {
    */
   has (key) {
     return this.map.has(key)
+  }
+
+  /**
+   * Performance optimization: Clean up fragmented array when it grows too large
+   * This method removes gaps and consolidates the array for better performance
+   */
+  cleanup () {
+    if (this.yarray.length <= this._cleanupThreshold) return
+    
+    this.doc.transact(_tr => {
+      const currentEntries = Array.from(this.map.values())
+      // Clear the array and rebuild with only current values
+      this.yarray.delete(0, this.yarray.length)
+      this.yarray.push(currentEntries)
+      this._lastCleanupSize = this.yarray.length
+    })
+  }
+
+  /**
+   * Performance optimization: Auto cleanup when array becomes fragmented
+   * @private
+   */
+  _maybeCleanup () {
+    // If array is significantly larger than the number of unique keys, cleanup
+    // Use a lower threshold to ensure cleanup happens more frequently
+    if (this.yarray.length > this.map.size * this._fragmentationRatio && 
+        this.yarray.length > this._minCleanupSize) {
+      this.cleanup()
+    }
+  }
+
+  /**
+   * Get the current size of unique keys
+   * @return {number}
+   */
+  get size () {
+    return this.map.size
+  }
+
+  /**
+   * Get all keys
+   * @return {Array<string>}
+   */
+  keys () {
+    return Array.from(this.map.keys())
+  }
+
+  /**
+   * Get all values
+   * @return {Array<T>}
+   */
+  values () {
+    return Array.from(this.map.values()).map(entry => entry.val)
+  }
+
+  /**
+   * Get all entries as [key, value] pairs
+   * @return {Array<[string, T]>}
+   */
+  entries () {
+    return Array.from(this.map.entries()).map(([key, entry]) => [key, entry.val])
+  }
+
+  /**
+   * Clear all entries
+   */
+  clear () {
+    if (this.map.size === 0) return
+    
+    this.doc.transact(_tr => {
+      this.yarray.delete(0, this.yarray.length)
+    })
   }
 }

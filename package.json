@@ -43,6 +43,7 @@
     "debug": "rollup -c && concurrently 'rollup -wc' 'http-server -o test.html'",
     "test": "c8 --check-coverage --lines 100 --branches 100 --functions 100 --statements 100 node --unhandled-rejections=strict ./test.js --repetition-time 50 --production",
     "test-inspect": "node --inspect-brk --unhandled-rejections=strict ./test.js --repetition-time 50 --production",
+    "benchmark": "node performance-benchmark.js",
     "test-extensive": "node test.js && npm test -- --repetition-time 30000 --extensive",
     "trace-deopt": "clear && rollup -c  && node --trace-deopt dist/test.cjs",
     "trace-opt": "clear && rollup -c  && node --trace-opt dist/test.cjs",
